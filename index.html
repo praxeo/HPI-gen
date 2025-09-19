@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ED HPI Generator v2.0</title>
+    <style>
+        :root {
+            --uab-green: #1A5632;
+            --uab-gold: #D1B464;
+            --light-bg: #f4f7f9;
+            --card-bg: #ffffff;
+            --border-color: #eef2f5;
+            --text-primary: #333;
+            --text-secondary: #6c757d;
+            --success-bg: #d1e7dd;
+            --warning-bg: #fff3cd;
+            --danger-bg: #f8d7da;
+            --info-bg: #cce5ff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        #app-container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: var(--uab-green);
+            border-bottom: 3px solid var(--uab-gold);
+            padding-bottom: 15px;
+            margin-top: 0;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+        
+        #narrative-container {
+            display: none;
+            background-color: #eef2f5;
+            border: 1px solid #d6dde3;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+        
+        #narrative-container h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--uab-green);
+            font-size: 1.1em;
+        }
+        
+        #narrative-list {
+            padding-left: 20px;
+            margin: 0;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        
+        #narrative-list li {
+            margin-bottom: 5px;
+        }
+        
+        .pathway-step {
+            display: none;
+            padding: 25px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+            text-align: left;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pathway-step h2 {
+            margin-top: 0;
+            color: var(--uab-green);
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        .pathway-step p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .options {
+            margin-top: 25px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        button {
+            background-color: var(--uab-green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.2s;
+            flex-grow: 1;
+            max-width: 320px;
+            line-height: 1.4;
+        }
+        
+        button:hover {
+            background-color: #144529;
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            background-color: #cdd2d8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        button small {
+            font-size: 0.8em;
+            font-weight: 400;
+            opacity: 0.9;
+            display: block;
+            margin-top: 4px;
+        }
+        
+        button.restart-btn {
+            background-color: #6c757d;
+        }
+        
+        button.restart-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .outcome-discharge { background-color: var(--success-bg); border-color: #a3c9a8; }
+        .outcome-admit { background-color: var(--danger-bg); border-color: #f5c6cb; }
+        .outcome-observe { background-color: var(--warning-bg); border-color: #ffeeba; }
+        
+        strong { color: #1a253c; }
+        
+        .note {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            text-align: left;
+        }
+        
+        .note ul { padding-left: 20px; margin: 10px 0 0 0; }
+        .note li { margin-bottom: 5px; }
+        
+        footer { 
+            margin-top: 30px; 
+            font-size: 0.8em; 
+            color: var(--text-secondary); 
+            text-align: center;
+        }
+        
+        footer a { 
+            color: var(--uab-green); 
+            text-decoration: none; 
+            font-weight: 500; 
+            font-size: 1.1em; 
+        }
+        
+        footer a:hover { text-decoration: underline; }
+        
+        #nav-controls { 
+            margin-top: 25px; 
+            padding-top: 20px; 
+            border-top: 1px solid var(--border-color); 
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        #back-btn { 
+            background-color: #6c757d; 
+            max-width: 150px; 
+        }
+        
+        #back-btn:hover { 
+            background-color: #5a6268; 
+        }
+        
+        #back-btn:disabled { 
+            background-color: #e9ecef; 
+        }
+        
+        .calculator { 
+            margin-top: 20px; 
+            text-align: left; 
+        }
+        
+        .calc-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 10px 0; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        
+        .calc-row label { 
+            font-weight: 500; 
+        }
+        
+        .calc-row select { 
+            padding: 8px; 
+            border-radius: 4px; 
+            border: 1px solid #ced4da; 
+            width: 60%; 
+            font-family: 'Inter', sans-serif; 
+        }
+        
+        #score-display { 
+            margin-top: 20px; 
+            font-size: 1.5em; 
+            font-weight: bold; 
+        }
+        
+        #score-display span { 
+            display: inline-block; 
+            padding: 10px 20px; 
+            border-radius: 8px; 
+            color: #fff; 
+        }
+        
+        .score-low { background-color: var(--uab-green); }
+        .score-intermediate { background-color: var(--uab-gold); color: #333 !important;}
+        .score-high { background-color: #dc3545; }
+        
+        /* HPI Generator Specific Styles */
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--uab-green);
+            font-size: 1.1em;
+        }
+        
+        .input-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .input-row > div {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #ced4da;
+            font-family: 'Inter', sans-serif;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .checkbox-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+            margin: 0;
+        }
+        
+        .checkbox-item.selected {
+            background-color: #d1e7dd;
+            border-color: var(--uab-green);
+        }
+        
+        .time-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .time-option {
+            padding: 10px 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex: 1;
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .time-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .time-option.selected {
+            background-color: var(--uab-green);
+            color: white;
+            border-color: var(--uab-green);
+        }
+        
+        #hpi-output {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: left;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: 'Inter', sans-serif;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .copy-btn {
+            background-color: #6c757d;
+            margin-top: 15px;
+            max-width: 200px;
+        }
+        
+        .copy-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .hidden { display: none; }
+        
+        .section-title {
+            color: var(--uab-green);
+            border-bottom: 1px solid var(--uab-gold);
+            padding-bottom: 8px;
+            margin: 25px 0 15px 0;
+            font-weight: 600;
+        }
+        
+        .cc-option {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .cc-option:hover {
+            background-color: #e9ecef;
+        }
+        
+        .cc-option.selected {
+            background-color: var(--uab-green);
+            color: white;
+            border-color: var(--uab-green);
+        }
+        
+        .severity-slider {
+            width: 100%;
+            margin: 15px 0;
+        }
+        
+        .severity-value {
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.2em;
+            color: var(--uab-green);
+        }
+        
+        .history-section {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e9ecef;
+        }
+        
+        .history-section h3 {
+            color: var(--uab-green);
+            margin-top: 0;
+        }
+        
+        .med-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .med-item {
+            padding: 8px 15px;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .surgical-item {
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+        
+        .ai-btn {
+            background-color: #0d6efd;
+            margin-top: 15px;
+        }
+        
+        .ai-btn:hover {
+            background-color: #0b5ed7;
+        }
+        
+        @media (max-width: 600px) {
+            .input-row {
+                flex-direction: column;
+            }
+            
+            .input-row > div {
+                min-width: 100%;
+            }
+            
+            .checkbox-group {
+                flex-direction: column;
+            }
+            
+            .checkbox-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <h1>Emergency Department HPI Generator</h1>
+        
+        <div id="narrative-container">
+            <h3>Progress Log</h3>
+            <ol id="narrative-list"></ol>
+        </div>
+
+        <div id="pathway-content">
+            
+            <div id="start-screen" class="pathway-step" style="display: block;">
+                <h2>Welcome to the HPI Generator</h2>
+                <p>This tool helps you quickly create a comprehensive History of Present Illness by answering simple questions. The generated HPI will include relevant history, medications, and surgical history based on your chief complaint.</p>
+                <div class="options">
+                    <button onclick="navigateTo('chief-complaint', this)" data-narrative="Started HPI generation process.">Start HPI Generator</button>
+                </div>
+            </div>
+
+            <div id="chief-complaint" class="pathway-step">
+                <h2>Select Chief Complaint</h2>
+                <p>What is the patient's primary complaint?</p>
+                
+                <div class="input-group">
+                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Chest Pain')">Chest Pain</div>
+                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Shortness of Breath')">Shortness of Breath</div>
+                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Abdominal Pain')">Abdominal Pain</div>
+                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Headache')">Headache</div>
+                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Other')">Other</div>
+                </div>
+                
+                <div id="other-cc-input" class="input-group hidden">
+                    <label>Please specify:</label>
+                    <input type="text" id="custom-cc" placeholder="Enter chief complaint...">
+                </div>
+                
+                <div class="options">
+                    <button id="cc-continue-btn" onclick="processChiefComplaint()" disabled>Continue</button>
+                </div>
+            </div>
+
+            <div id="onset-duration" class="pathway-step">
+                <h2>Onset & Duration</h2>
+                
+                <div class="input-group">
+                    <label>When did symptoms start?</label>
+                    <div class="input-row">
+                        <div>
+                            <input type="number" id="onset-value" placeholder="Number" min="0">
+                        </div>
+                        <div>
+                            <div class="time-selector" id="onset-unit">
+                                <div class="time-option" onclick="selectTimeUnit(this, 'minutes')">Minutes</div>
+                                <div class="time-option" onclick="selectTimeUnit(this, 'hours')">Hours</div>
+                                <div class="time-option" onclick="selectTimeUnit(this, 'days')">Days</div>
+                                <div class="time-option" onclick="selectTimeUnit(this, 'weeks')">Weeks</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label>How long have symptoms persisted?</label>
+                    <div class="input-row">
+                        <div>
+                            <input type="number" id="duration-value" placeholder="Number" min="0">
+                        </div>
+                        <div>
+                            <div class="time-selector" id="duration-unit">
+                                <div class="time-option" onclick="selectTimeUnit(this, 'minutes')">Minutes</div>
+                                <div class="time-option" onclick="selectTimeUnit(this, 'hours')">Hours</div>
+                                <div class="time-option" onclick="selectTimeUnit(this, 'days')">Days</div>
+                                <div class="time-option" onclick="selectTimeUnit(this, 'weeks')">Weeks</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="options">
+                    <button onclick="processOnsetDuration()">Continue</button>
+                </div>
+            </div>
+
+            <div id="location-character" class="pathway-step">
+                <h2>Location & Character</h2>
+                
+                <div class="input-group">
+                    <label>Where is the pain/discomfort located?</label>
+                    <input type="text" id="location-input" placeholder="e.g., Left chest, Epigastric...">
+                </div>
+                
+                <div class="input-group">
+                    <label>How would you describe the sensation?</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="sharp" value="sharp">
+                            <label for="sharp">Sharp</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="dull" value="dull">
+                            <label for="dull">Dull</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="pressure" value="pressure">
+                            <label for="pressure">Pressure</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="burning" value="burning">
+                            <label for="burning">Burning</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="crushing" value="crushing">
+                            <label for="crushing">Crushing</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="tightness" value="tightness">
+                            <label for="tightness">Tightness</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="options">
+                    <button onclick="processLocationCharacter()">Continue</button>
+                </div>
+            </div>
+
+            <div id="radiation-severity" class="pathway-step">
+                <h2>Radiation & Severity</h2>
+                
+                <div class="input-group">
+                    <label>Does the pain radiate anywhere?</label>
+                    <input type="text" id="radiation-input" placeholder="e.g., Left arm, Jaw, Back...">
+                </div>
+                
+                <div class="input-group">
+                    <label>How severe is the pain on a scale of 0-10?</label>
+                    <input type="range" id="severity-slider" class="severity-slider" min="0" max="10" value="5">
+                    <div class="severity-value"><span id="severity-value">5</span>/10</div>
+                </div>
+                
+                <div class="options">
+                    <button onclick="processRadiationSeverity()">Continue</button>
+                </div>
+            </div>
+
+            <div id="timing-context" class="pathway-step">
+                <h2>Timing & Context</h2>
+                
+                <div class="input-group">
+                    <label>What were you doing when symptoms started?</label>
+                    <input type="text" id="context-input" placeholder="e.g., Exercising, Eating, Resting...">
+                </div>
+                
+                <div class="input-group">
+                    <label>What time of day did symptoms start?</label>
+                    <input type="text" id="timing-input" placeholder="e.g., Morning, Afternoon, During sleep...">
+                </div>
+                
+                <div class="options">
+                    <button onclick="processTimingContext()">Continue</button>
+                </div>
+            </div>
+
+            <div id="modifying-factors" class="pathway-step">
+                <h2>Modifying Factors</h2>
+                
+                <div class="input-group">
+                    <label>What makes the symptoms better?</label>
+                    <input type="text" id="better-input" placeholder="e.g., Rest, Nitroglycerin, Position change...">
+                </div>
+                
+                <div class="input-group">
+                    <label>What makes the symptoms worse?</label>
+                    <input type="text" id="worse-input" placeholder="e.g., Exertion, Deep breathing, Lying flat...">
+                </div>
+                
+                <div class="options">
+                    <button onclick="processModifyingFactors()">Continue</button>
+                </div>
+            </div>
+
+            <div id="associated-symptoms" class="pathway-step">
+                <h2>Associated Symptoms</h2>
+                
+                <div class="input-group">
+                    <label>Check any associated symptoms:</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="nausea" value="nausea">
+                            <label for="nausea">Nausea</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="vomiting" value="vomiting">
+                            <label for="vomiting">Vomiting</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="diaphoresis" value="diaphoresis">
+                            <label for="diaphoresis">Diaphoresis</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="dyspnea" value="dyspnea">
+                            <label for="dyspnea">Dyspnea</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="palpitations" value="palpitations">
+                            <label for="palpitations">Palpitations</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="syncope" value="syncope">
+                            <label for="syncope">Syncope</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="options">
+                    <button onclick="processAssociatedSymptoms()">Continue</button>
+                </div>
+            </div>
+
+            <div id="relevant-history" class="pathway-step">
+                <h2>Relevant History</h2>
+                
+                <div class="history-section">
+                    <h3>Medical History</h3>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="htn" value="hypertension">
+                            <label for="htn">Hypertension</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="dm" value="diabetes">
+                            <label for="dm">Diabetes</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="cad" value="coronary artery disease">
+                            <label for="cad">CAD</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="chf" value="congestive heart failure">
+                            <label for="chf">CHF</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="copd" value="COPD">
+                            <label for="copd">COPD</label>
+                        </div>
+                        <div class="checkbox-item" onclick="toggleCheckbox(this)">
+                            <input type="checkbox" id="asthma" value="asthma">
+                            <label for="asthma">Asthma</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="history-section">
+                    <h3>Medications</h3>
+                    <div class="med-list">
+                        <div class="med-item">Aspirin</div>
+                        <div class="med-item">Lisinopril</div>
+                        <div class="med-item">Metoprolol</div>
+                        <div class="med-item">Atorvastatin</div>
+                        <div class="med-item">Nitroglycerin</div>
+                        <div class="med-item">Albuterol</div>
+                    </div>
+                </div>
+                
+                <div class="history-section">
+                    <h3>Surgical History</h3>
+                    <div class="surgical-item">Coronary artery bypass graft (CABG)</div>
+                    <div class="surgical-item">Percutaneous coronary intervention (PCI)</div>
+                    <div class="surgical-item">Appendectomy</div>
+                    <div class="surgical-item">Cholecystectomy</div>
+                </div>
+                
+                <div class="options">
+                    <button onclick="processRelevantHistory()">Continue</button>
+                </div>
+            </div>
+
+            <div id="hpi-output-step" class="pathway-step">
+                <h2>Generated HPI</h2>
+                <p>Your History of Present Illness has been generated:</p>
+                <div id="hpi-output"></div>
+                <div class="options">
+                    <button class="copy-btn" onclick="copyToClipboard()">Copy to Clipboard</button>
+                    <button class="ai-btn" onclick="applyAIRefinement()">AI Refinement (Demo)</button>
+                    <button class="restart-btn" onclick="restart()">Generate Another</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="nav-controls">
+            <button id="back-btn" onclick="goBack()" disabled>Back</button>
+            <div id="step-indicator">Step 1 of 8</div>
+        </div>
+
+        <footer>
+            <p>ED HPI Generator v2.0 | For educational purposes only</p>
+        </footer>
+    </div>
+
+    <script>
+        let navigationHistory = ['start-screen'];
+        let narrativeSteps = [];
+        let hpiData = {};
+        let currentStep = 1;
+        const totalSteps = 8;
+
+        function updateNarrative(phrase) {
+            if (phrase) {
+                narrativeSteps.push(phrase);
+            }
+
+            const narrativeContainer = document.getElementById('narrative-container');
+            const narrativeList = document.getElementById('narrative-list');
+            
+            if (narrativeSteps.length > 0) {
+                narrativeContainer.style.display = 'block';
+            } else {
+                narrativeContainer.style.display = 'none';
+            }
+
+            narrativeList.innerHTML = '';
+            narrativeSteps.forEach(step => {
+                const li = document.createElement('li');
+                li.textContent = step;
+                narrativeList.appendChild(li);
+            });
+        }
+
+        function displayStep(stepId) {
+            document.querySelectorAll('.pathway-step').forEach(step => {
+                step.style.display = 'none';
+            });
+            const currentStep = document.getElementById(stepId);
+            if (currentStep) {
+                currentStep.style.display = 'block';
+            }
+            updateNavButtons();
+            updateStepIndicator();
+        }
+
+        function navigateTo(stepId, element) {
+            if (navigationHistory[navigationHistory.length - 1] !== stepId) {
+                navigationHistory.push(stepId);
+            }
+            if (element) {
+                const narrativePhrase = element.getAttribute('data-narrative');
+                updateNarrative(narrativePhrase);
+            }
+            displayStep(stepId);
+        }
+
+        function goBack() {
+            if (navigationHistory.length > 1) {
+                navigationHistory.pop();
+                narrativeSteps.pop();
+                updateNarrative(null);
+                const previousStepId = navigationHistory[navigationHistory.length - 1];
+                displayStep(previousStepId);
+                currentStep--;
+            }
+        }
+        
+        function restart() {
+            navigationHistory = ['start-screen'];
+            narrativeSteps = [];
+            hpiData = {};
+            currentStep = 1;
+            updateNarrative(null);
+            displayStep('start-screen');
+            
+            // Clear all input fields and selections
+            document.querySelectorAll('input, textarea, select').forEach(el => {
+                if (el.type === 'checkbox') {
+                    el.checked = false;
+                } else {
+                    el.value = '';
+                }
+            });
+            
+            // Reset selections
+            document.querySelectorAll('.cc-option, .time-option, .checkbox-item').forEach(el => {
+                el.classList.remove('selected');
+            });
+            
+            // Reset slider
+            document.getElementById('severity-slider').value = 5;
+            document.getElementById('severity-value').textContent = '5';
+            
+            // Hide custom CC input
+            document.getElementById('other-cc-input').classList.add('hidden');
+            document.getElementById('cc-continue-btn').disabled = true;
+        }
+
+        function updateNavButtons() {
+            const backBtn = document.getElementById('back-btn');
+            backBtn.disabled = navigationHistory.length <= 1;
+        }
+        
+        function updateStepIndicator() {
+            const indicator = document.getElementById('step-indicator');
+            indicator.textContent = `Step ${currentStep} of ${totalSteps}`;
+        }
+
+        // HPI Generation Functions
+        function selectChiefComplaint(element, value) {
+            // Remove selected class from all options
+            document.querySelectorAll('.cc-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            
+            // Handle "Other" option
+            if (value === 'Other') {
+                document.getElementById('other-cc-input').classList.remove('hidden');
+                hpiData.chiefComplaint = '';
+            } else {
+                document.getElementById('other-cc-input').classList.add('hidden');
+                hpiData.chiefComplaint = value;
+            }
+            
+            // Enable continue button
+            document.getElementById('cc-continue-btn').disabled = false;
+        }
+        
+        function processChiefComplaint() {
+            // If "Other" was selected, get custom value
+            if (!hpiData.chiefComplaint) {
+                const customCC = document.getElementById('custom-cc').value.trim();
+                if (!customCC) {
+                    alert('Please specify the chief complaint');
+                    return;
+                }
+                hpiData.chiefComplaint = customCC;
+            }
+            
+            updateNarrative(`Chief complaint: ${hpiData.chiefComplaint}`);
+            currentStep++;
+            navigateTo('onset-duration');
+        }
+
+        function selectTimeUnit(element, value) {
+            // Remove selected class from all options in the same group
+            const parent = element.parentElement;
+            parent.querySelectorAll('.time-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            
+            // Store value in parent element's data attribute
+            parent.dataset.selected = value;
+        }
+        
+        function processOnsetDuration() {
+            const onsetValue = document.getElementById('onset-value').value;
+            const onsetUnit = document.getElementById('onset-unit').dataset.selected;
+            const durationValue = document.getElementById('duration-value').value;
+            const durationUnit = document.getElementById('duration-unit').dataset.selected;
+            
+            if (!onsetValue || !onsetUnit || !durationValue || !durationUnit) {
+                alert('Please enter both onset and duration values with units');
+                return;
+            }
+            
+            hpiData.onset = `${onsetValue} ${onsetUnit}`;
+            hpiData.duration = `${durationValue} ${durationUnit}`;
+            updateNarrative(`Onset: ${hpiData.onset}, Duration: ${hpiData.duration}`);
+            currentStep++;
+            navigateTo('location-character');
+        }
+
+        function toggleCheckbox(element) {
+            element.classList.toggle('selected');
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+        }
+        
+        function processLocationCharacter() {
+            const location = document.getElementById('location-input').value.trim();
+            if (!location) {
+                alert('Please enter location of symptoms');
+                return;
+            }
+            
+            const characterOptions = ['sharp', 'dull', 'pressure', 'burning', 'crushing', 'tightness'];
+            const selectedCharacters = characterOptions
+                .filter(id => document.getElementById(id).checked)
+                .map(id => document.getElementById(id).value);
+            
+            if (selectedCharacters.length === 0) {
+                alert('Please select at least one character descriptor');
+                return;
+            }
+            
+            hpiData.location = location;
+            hpiData.character = selectedCharacters.join(', ');
+            updateNarrative(`Location: ${location}, Character: ${hpiData.character}`);
+            currentStep++;
+            navigateTo('radiation-severity');
+        }
+
+        function processRadiationSeverity() {
+            const radiation = document.getElementById('radiation-input').value.trim();
+            const severity = document.getElementById('severity-slider').value;
+            
+            hpiData.radiation = radiation || 'None';
+            hpiData.severity = severity;
+            updateNarrative(`Radiation: ${hpiData.radiation}, Severity: ${severity}/10`);
+            currentStep++;
+            navigateTo('timing-context');
+        }
+        
+        // Update severity value as slider moves
+        document.getElementById('severity-slider').addEventListener('input', function() {
+            document.getElementById('severity-value').textContent = this.value;
+        });
+
+        function processTimingContext() {
+            const context = document.getElementById('context-input').value.trim();
+            const timing = document.getElementById('timing-input').value.trim();
+            
+            if (!context || !timing) {
+                alert('Please enter both context and timing');
+                return;
+            }
+            
+            hpiData.context = context;
+            hpiData.timing = timing;
+            updateNarrative(`Context: ${context}, Timing: ${timing}`);
+            currentStep++;
+            navigateTo('modifying-factors');
+        }
+
+        function processModifyingFactors() {
+            const better = document.getElementById('better-input').value.trim();
+            const worse = document.getElementById('worse-input').value.trim();
+            
+            hpiData.better = better || 'None reported';
+            hpiData.worse = worse || 'None reported';
+            updateNarrative(`Alleviating factors: ${hpiData.better}, Aggravating factors: ${hpiData.worse}`);
+            currentStep++;
+            navigateTo('associated-symptoms');
+        }
+
+        function processAssociatedSymptoms() {
+            const symptomOptions = ['nausea', 'vomiting', 'diaphoresis', 'dyspnea', 'palpitations', 'syncope'];
+            const selectedSymptoms = symptomOptions
+                .filter(id => document.getElementById(id).checked)
+                .map(id => document.getElementById(id).value);
+            
+            hpiData.associatedSymptoms = selectedSymptoms.length > 0 
+                ? selectedSymptoms.join(', ') 
+                : 'None reported';
+            updateNarrative(`Associated symptoms: ${hpiData.associatedSymptoms}`);
+            currentStep++;
+            navigateTo('relevant-history');
+        }
+
+        function processRelevantHistory() {
+            // Get medical history
+            const historyOptions = ['htn', 'dm', 'cad', 'chf', 'copd', 'asthma'];
+            const selectedHistory = historyOptions
+                .filter(id => document.getElementById(id).checked)
+                .map(id => document.getElementById(id).value);
+            
+            hpiData.medicalHistory = selectedHistory.length > 0 
+                ? selectedHistory.join(', ') 
+                : 'No significant past medical history';
+            
+            // Get medications (for demo, we'll just list some common ones)
+            hpiData.medications = 'Aspirin, Lisinopril, Metoprolol, Atorvastatin';
+            
+            // Get surgical history (for demo, we'll just list some common ones)
+            hpiData.surgicalHistory = 'CABG, PCI';
+            
+            updateNarrative(`Medical history: ${hpiData.medicalHistory}`);
+            generateHPI();
+            currentStep++;
+            navigateTo('hpi-output-step');
+        }
+
+        function generateHPI() {
+            const hpi = `
+${hpiData.chiefComplaint} started ${hpiData.onset} ago and has persisted for ${hpiData.duration}. 
+The pain is located in the ${hpiData.location} and is described as ${hpiData.character}. 
+Severity is ${hpiData.severity}/10. ${hpiData.radiation !== 'None' ? `Radiation to ${hpiData.radiation}. ` : ''}
+Symptoms began while ${hpiData.context} in the ${hpiData.timing}. 
+${hpiData.better !== 'None reported' ? `Symptoms improve with ${hpiData.better}. ` : ''}
+${hpiData.worse !== 'None reported' ? `Symptoms worsen with ${hpiData.worse}. ` : ''}
+Associated symptoms include ${hpiData.associatedSymptoms}. 
+
+Past Medical History: ${hpiData.medicalHistory}. 
+Medications: ${hpiData.medications}. 
+Surgical History: ${hpiData.surgicalHistory}.
+            `.trim();
+
+            document.getElementById('hpi-output').textContent = hpi;
+        }
+
+        function copyToClipboard() {
+            const hpiText = document.getElementById('hpi-output').textContent;
+            navigator.clipboard.writeText(hpiText).then(() => {
+                alert('HPI copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                alert('Failed to copy HPI. Please try again.');
+            });
+        }
+        
+        function applyAIRefinement() {
+            const currentHPI = document.getElementById('hpi-output').textContent;
+            const refinedHPI = `AI-Refined HPI:\n\n${currentHPI}\n\n[AI refinement would optimize language and structure here]`;
+            document.getElementById('hpi-output').textContent = refinedHPI;
+        }
+
+        displayStep('start-screen');
+    </script>
+
+</body>
+</html>
