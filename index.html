@@ -320,11 +320,6 @@
             background-color: #e9ecef;
         }
         
-        .checkbox-item input {
-            width: auto;
-            margin: 0;
-        }
-        
         .checkbox-item.selected {
             background-color: #d1e7dd;
             border-color: var(--uab-green);
@@ -392,6 +387,13 @@
             font-weight: 600;
         }
         
+        .cc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
         .cc-option {
             padding: 15px;
             background-color: #f8f9fa;
@@ -399,7 +401,6 @@
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
-            margin-bottom: 10px;
             text-align: center;
         }
         
@@ -484,6 +485,10 @@
             .checkbox-item {
                 width: 100%;
             }
+            
+            .cc-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -512,11 +517,23 @@
                 <p>What is the patient's primary complaint?</p>
                 
                 <div class="input-group">
-                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Chest Pain')">Chest Pain</div>
-                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Shortness of Breath')">Shortness of Breath</div>
-                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Abdominal Pain')">Abdominal Pain</div>
-                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Headache')">Headache</div>
-                    <div class="cc-option" onclick="selectChiefComplaint(this, 'Other')">Other</div>
+                    <div class="cc-grid">
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Chest Pain')">Chest Pain</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Shortness of Breath')">Shortness of Breath</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Abdominal Pain')">Abdominal Pain</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Headache')">Headache</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Laceration')">Laceration</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Musculoskeletal Complaint')">Musculoskeletal Complaint</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Motor Vehicle Collision')">Motor Vehicle Collision</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Stroke-like Symptoms')">Stroke-like Symptoms</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Abscess')">Abscess</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Flu-like / Cold / Cough')">Flu-like / Cold / Cough</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Altered Mental Status')">Altered Mental Status</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Injury')">Injury</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Pregnancy Related')">Pregnancy Related</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Genitourinary Complaint')">Genitourinary Complaint</div>
+                        <div class="cc-option" onclick="selectChiefComplaint(this, 'Other')">Other</div>
+                    </div>
                 </div>
                 
                 <div id="other-cc-input" class="input-group hidden">
@@ -1112,3 +1129,4 @@ Surgical History: ${hpiData.surgicalHistory}.
 
 </body>
 </html>
+
