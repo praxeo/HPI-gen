@@ -1,0 +1,127 @@
+/* UAB Medicine Training Site Stylesheet - V2 (Polished) */
+
+:root {
+    --uab-green: #1a5632;
+    --campus-green: #90d408;
+    --healing-teal: #007580;
+    --bham-sky-blue: #42caf0;
+    --white: #ffffff;
+    --light-gray: #f8f9fa;
+    --text-color: #212529;
+    --border-radius: 8px;
+    --transition-speed: 0.3s;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: var(--light-gray);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: Arial, sans-serif;
+    font-weight: normal;
+    color: var(--uab-green);
+}
+a {
+    color: var(--healing-teal);
+    text-decoration: none;
+    transition: color var(--transition-speed);
+}
+a:hover {
+    color: var(--bham-sky-blue);
+}
+.page-header {
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+}
+.page-headline {
+    font-weight: lighter;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+.page-subhead {
+    font-size: 1.5rem;
+    color: var(--text-color);
+    margin-top: 0;
+}
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+.site-header {
+    background-color: var(--uab-green);
+    padding: 1rem 0;
+    border-bottom: 5px solid var(--campus-green);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.site-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.header-logo {
+  height: 55px;
+}
+.site-nav {
+    background-color: var(--white);
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+.site-nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+.site-nav a {
+    color: #333;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: var(--border-radius);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+.site-nav a:hover {
+    background-color: var(--uab-green);
+    color: var(--white);
+    text-decoration: none;
+}
+main {
+    padding: 2rem 0;
+}
+.card {
+    background-color: var(--white);
+    padding: 1.5rem 2rem;
+    border-radius: var(--border-radius);
+    margin-top: 2rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+th {
+    background-color: var(--light-gray);
+    color: var(--uab-green);
+}
