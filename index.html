@@ -1,677 +1,706 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HPI Generator — ED</title>
-<style>
-  :root{
-    --bg:#0b0f14; --fg:#e7eef7; --muted:#a6b1be; --card:#121720; --accent:#8ab4ff; --danger:#ff6b6b; --ok:#76d275; --line:#1b2330;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-  header{padding:8px 14px;border-bottom:1px solid var(--line);display:flex;gap:12px;align-items:center;position:sticky;top:0;background:linear-gradient(#0b0f14, #0b0f14ee)}
-  h1{font-size:16px;margin:0 8px 0 0;color:var(--muted);font-weight:600}
-  .pill{background:var(--card);border:1px solid var(--line);padding:6px 8px;border-radius:999px;display:flex;align-items:center;gap:6px}
-  .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
-  .seg button{background:transparent;color:var(--fg);padding:6px 10px;border:0;border-right:1px solid var(--line);cursor:pointer}
-  .seg button:last-child{border-right:0}
-  .seg button.active{background:var(--accent);color:#041225}
-  input,textarea,select{background:#0f1520;color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:8px}
-  input[type="number"]{width:7ch}
-  .hidden{display:none}
-  main{display:grid;grid-template-columns:260px 1fr 420px;gap:12px;padding:12px}
-  aside,.panel,.preview{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;min-height:70vh}
-  .sec-title{font-weight:700;margin:8px 0 6px 0;color:#cbd6e2}
-  .chip{display:inline-flex;align-items:center;gap:6px;background:#0f1520;border:1px solid var(--line);border-radius:999px;padding:6px 10px;margin:4px 6px 0 0;cursor:pointer}
-  .chip.active{outline:2px solid var(--accent);box-shadow:0 0 0 2px #0000,inset 0 0 0 999px rgba(138,180,255,.15)}
-  .chip.danger{border-color:#3a2330;color:#ffb2b2}
-  .stack{display:flex;flex-direction:column;gap:10px}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
-  hr{border:0;border-top:1px solid var(--line);margin:10px 0}
-  .muted{color:var(--muted)}
-  .kicker{color:#bcd; font-weight:600; letter-spacing:.02em}
-  .preview{position:sticky; top:64px; display:flex; flex-direction:column}
-  .preview textarea{flex:1;resize:vertical;min-height:320px}
-  .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .right{margin-left:auto}
-  .btn{background:#111827;border:1px solid var(--line);color:var(--fg);padding:8px 12px;border-radius:10px;cursor:pointer}
-  .btn.primary{background:var(--accent);color:#041225;border-color:#508ffb}
-  .btn.ghost{background:transparent}
-  .badge{border:1px solid var(--line);border-radius:999px;padding:4px 8px;color:var(--muted)}
-  .warn{color:var(--danger)}
-  .ok{color:var(--ok)}
-  details summary{cursor:pointer;color:var(--muted)}
-  .breadcrumb{display:flex;flex-wrap:wrap;gap:6px}
-  .crumb{padding:4px 8px;border:1px dashed var(--line);border-radius:8px;color:var(--muted)}
-  .crumb.done{border-style:solid;color:#bfe}
-</style>
+  <meta charset="utf-8">
+  <title>HPI Generator — UAB ED</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Your UAB stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- Small additions that honor your variables/classes -->
+  <style>
+    .content-grid { display: grid; grid-template-columns: 280px 1fr 440px; gap: 16px; }
+    @media (max-width: 1100px) { .content-grid { grid-template-columns: 1fr; } }
+
+    .control-row { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:center; }
+    .pill { display:inline-flex; align-items:center; gap:8px; background:var(--white); border:1px solid #ddd; border-radius:var(--border-radius); padding:8px 10px; }
+    .pill label { font-weight:bold; color:var(--uab-green); }
+
+    .seg{ display:inline-flex; border:1px solid #ddd; border-radius:var(--border-radius); overflow:hidden; }
+    .seg button{ border:none; background:transparent; padding:6px 10px; cursor:pointer; font-weight:bold; color:var(--text-color); }
+    .seg button + button { border-left:1px solid #ddd; }
+    .seg button.active{ background:var(--campus-green); color:var(--white); }
+
+    .chip{ display:inline-flex; align-items:center; padding:8px 10px; border:1px solid #ddd; border-radius:var(--border-radius); background:var(--light-gray); cursor:pointer; user-select:none; transition:transform var(--transition-speed), box-shadow var(--transition-speed); }
+    .chip:hover{ transform:translateY(-1px); box-shadow:0 2px 6px rgba(0,0,0,0.06); }
+    .chip.active{ background:var(--bham-sky-blue); color:#08313a; border-color:var(--bham-sky-blue); }
+    .chip.danger{ border-color:#e6b8b8; background:#fff6f6; color:#7a1c1c; }
+    .chip.danger.active{ background:#ffebeb; color:#5a0f0f; border-color:#e2a2a2; }
+
+    .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:8px; }
+    .row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+    .muted{ color:#6c757d; }
+    .section-title{ margin:0 0 6px 0; color:var(--uab-green); font-weight:bold; }
+
+    .breadcrumb{ display:flex; flex-wrap:wrap; gap:8px; }
+    .crumb{ padding:4px 8px; border:1px dashed #ddd; border-radius:var(--border-radius); color:#6c757d; background:#fff; }
+    .crumb.done{ border-style:solid; color:var(--uab-green); }
+
+    .badge{ display:inline-block; background:var(--campus-green); color:var(--white); padding:4px 10px; border-radius:var(--border-radius); font-weight:bold; }
+
+    .btn{ border:1px solid #ddd; background:var(--white); color:var(--text-color); padding:8px 12px; border-radius:var(--border-radius); cursor:pointer; transition:background-color var(--transition-speed), box-shadow var(--transition-speed); font-weight:bold; }
+    .btn:hover{ background:var(--light-gray); }
+    .btn.primary{ background:var(--healing-teal); border-color:var(--healing-teal); color:var(--white); }
+    .btn.primary:hover{ background:#0a8e9b; }
+
+    textarea#preview{ width:100%; min-height:320px; resize:vertical; border-radius:var(--border-radius); border:1px solid #ddd; padding:12px; font:inherit; }
+    details summary{ cursor:pointer; color:var(--healing-teal); font-weight:bold; }
+    .hidden{ display:none !important; }
+
+    /* lightweight toast */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--uab-green); color: var(--white);
+      padding: 10px 14px; border-radius: var(--border-radius); box-shadow: 0 4px 12px rgba(0,0,0,.15);
+      opacity: 0; pointer-events: none; transition: opacity .25s ease;
+      z-index: 9999;
+    }
+    .toast.error { background:#b02a37; }
+    .toast.show { opacity: 1; }
+  </style>
 </head>
 <body>
+  <!-- Top header -->
+  <header class="site-header">
+    <div class="container">
+      <h1 class="page-header" style="color: var(--white); margin: 0;">HPI Generator</h1>
+    </div>
+  </header>
 
-<header>
-  <h1>HPI Generator</h1>
-  <div class="pill">
-    <span class="kicker">Age</span>
-    <input id="age" type="number" min="0" max="120" placeholder="Age">
-  </div>
-  <div class="pill">
-    <span class="kicker">Sex</span>
-    <div class="seg" id="sexSeg">
-      <button data-sex="female">F</button>
-      <button data-sex="male">M</button>
-      <button data-sex="other">Other</button>
-      <button data-sex="unknown">Unknown</button>
-    </div>
-    <input id="sexOther" class="hidden" type="text" placeholder="Specify other…" style="width:16ch">
-  </div>
-  <div class="pill hidden" id="pregPill">
-    <span class="kicker">Pregnancy</span>
-    <div class="seg" id="pregSeg">
-      <button data-preg="yes">Yes</button>
-      <button data-preg="no">No</button>
-      <button data-preg="unknown">Unknown</button>
-    </div>
-  </div>
-  <div class="right pill">
-    <details>
-      <summary>History source / limitations</summary>
-      <div class="row" style="margin-top:6px">
-        <label class="chip"><input type="checkbox" data-hist="patient"> patient</label>
-        <label class="chip"><input type="checkbox" data-hist="family"> family</label>
-        <label class="chip"><input type="checkbox" data-hist="ems"> EMS</label>
-        <label class="chip"><input type="checkbox" data-hist="chart"> chart review</label>
-        <label class="chip"><input type="checkbox" data-hist="unresponsive"> unresponsive</label>
-        <label class="chip"><input type="checkbox" data-hist="ams"> altered mental status</label>
-        <label class="chip"><input type="checkbox" data-hist="language"> language barrier</label>
+  <!-- Sticky controls -->
+  <nav class="site-nav">
+    <div class="container">
+      <div class="control-row">
+        <div class="pill">
+          <label for="age">Age</label>
+          <input id="age" type="number" min="0" max="120" placeholder="Age" style="width:7ch;">
+        </div>
+
+        <div class="pill">
+          <label>Sex</label>
+          <div id="sexSeg" class="seg">
+            <button type="button" data-sex="female">F</button>
+            <button type="button" data-sex="male">M</button>
+            <button type="button" data-sex="other">Other</button>
+            <button type="button" data-sex="unknown">Unknown</button>
+          </div>
+          <input id="sexOther" class="hidden" type="text" placeholder="Specify other…" style="width:18ch;">
+        </div>
+
+        <div class="pill hidden" id="pregPill">
+          <label>Pregnancy</label>
+          <div id="pregSeg" class="seg">
+            <button type="button" data-preg="yes">Yes</button>
+            <button type="button" data-preg="no">No</button>
+            <button type="button" data-preg="unknown">Unknown</button>
+          </div>
+        </div>
+
+        <div class="pill">
+          <details>
+            <summary>History source / limitations</summary>
+            <div class="row" style="margin-top:8px;">
+              <label class="chip"><input type="checkbox" data-hist="patient"> patient</label>
+              <label class="chip"><input type="checkbox" data-hist="family"> family</label>
+              <label class="chip"><input type="checkbox" data-hist="ems"> EMS</label>
+              <label class="chip"><input type="checkbox" data-hist="chart"> chart review</label>
+              <label class="chip"><input type="checkbox" data-hist="unresponsive"> unresponsive</label>
+              <label class="chip"><input type="checkbox" data-hist="ams"> altered mental status</label>
+              <label class="chip"><input type="checkbox" data-hist="language"> language barrier</label>
+            </div>
+          </details>
+        </div>
+
+        <!-- Import/Export -->
+        <div class="pill">
+          <input id="importInput" type="file" accept="application/json" class="hidden">
+          <button id="importBtn" class="btn">Import config</button>
+          <button id="exportBtn" class="btn">Export config</button>
+        </div>
       </div>
-    </details>
-  </div>
-</header>
-
-<main>
-  <!-- Left: complaint + progress -->
-  <aside>
-    <div class="stack">
-      <label class="sec-title">Chief complaint</label>
-      <select id="complaintSelect"></select>
-      <div id="pedsBadge" class="badge hidden">Pediatric mode</div>
-      <hr>
-      <div class="sec-title">Progress</div>
-      <div id="breadcrumb" class="breadcrumb"></div>
-      <div class="muted" style="margin-top:8px">Red flags are suggested, not required.</div>
     </div>
-  </aside>
+  </nav>
 
-  <!-- Center: dynamic questions -->
-  <section class="panel">
-    <div id="dyn"></div>
-  </section>
+  <main>
+    <div class="container content-grid">
+      <!-- Left: complaint + progress -->
+      <section class="card">
+        <h3 class="section-title">Chief complaint</h3>
+        <select id="complaintSelect" style="width:100%; padding:8px; border-radius:var(--border-radius); border:1px solid #ddd;"></select>
+        <div id="pedsBadge" class="badge hidden" style="margin-top:10px;">Pediatric mode</div>
+        <hr>
+        <h3 class="section-title">Progress</h3>
+        <div id="breadcrumb" class="breadcrumb"></div>
+        <p class="muted" style="margin-top:8px;">Red flags are suggested, not required.</p>
+      </section>
 
-  <!-- Right: preview -->
-  <section class="preview">
-    <div class="row">
-      <div class="sec-title" style="margin:0">Live HPI preview</div>
-      <button id="copyBtn" class="btn primary right">Copy</button>
+      <!-- Center: dynamic questions -->
+      <section class="card">
+        <div id="dyn"></div>
+      </section>
+
+      <!-- Right: preview -->
+      <section class="card">
+        <div class="row" style="justify-content: space-between;">
+          <h3 class="section-title" style="margin:0;">Live HPI preview</h3>
+          <button id="copyBtn" class="btn primary">Copy</button>
+        </div>
+        <textarea id="preview" placeholder="Your HPI will build here…"></textarea>
+        <div class="row" style="justify-content: space-between; margin-top:10px;">
+          <button id="resetBtn" class="btn">Reset</button>
+          <span id="rfHint" class="muted">💡 Mark red flags if present.</span>
+        </div>
+      </section>
     </div>
-    <textarea id="preview"></textarea>
-    <div class="row">
-      <button id="resetBtn" class="btn ghost">Reset</button>
-      <span id="rfHint" class="muted right">💡 Mark red flags if present.</span>
-    </div>
-  </section>
-</main>
+  </main>
 
-<script>
-/** =======================
- *  CONFIG (complaints)
- *  Add/edit here — no code changes needed for most tweaks.
- *  ======================= */
-const COMPLAINTS = [
-  {
-    id:"chest_pain",
-    label:"Chest pain (adult)",
-    audience:"adult",
-    redFlags:[
-      {id:"cp_syncope", label:"syncope / near-syncope"},
-      {id:"cp_rest_pain", label:"pain at rest with diaphoresis"},
-      {id:"cp_neuro", label:"neuro deficits"},
-      {id:"cp_hemoptysis", label:"hemoptysis"},
-      {id:"cp_cocaine", label:"recent cocaine"},
-      {id:"cp_anticoag", label:"on anticoagulation"}
-    ],
-    questions:[
-      {id:"onset", label:"Onset", type:"choice", options:["sudden","gradual","unclear"]},
-      {id:"duration", label:"Duration", type:"text", placeholder:"e.g., 30 minutes"},
-      {id:"timing", label:"Timing", type:"choice", options:["constant","intermittent","waxing/waning"]},
-      {id:"quality", label:"Quality", type:"choice", options:["pressure","tightness","sharp","burning","tearing"]},
-      {id:"severity", label:"Severity (0–10)", type:"scale", min:0, max:10, step:1},
-      {id:"location", label:"Location", type:"chips", options:["central","left chest","right chest","diffuse"]},
-      {id:"radiation", label:"Radiation", type:"chips", options:["none","left arm","jaw","back"]},
-      {id:"assoc", label:"Associated", type:"multichips", options:["dyspnea","diaphoresis","nausea/vomiting","palpitations","near-syncope"]},
-      {id:"risk", label:"Risk factors", type:"multichips", options:["known CAD","estrogen therapy","immobilization","active cancer","recent surgery","prior PE/DVT","cocaine use"]},
-      {id:"mods", label:"Modifiers", type:"multichips", options:["worse exertion","worse inspiration","better rest","worse lying flat","better leaning forward"]},
-      {id:"context", label:"Context / notes", type:"textarea"}
-    ]
-  },
-  {
-    id:"headache",
-    label:"Headache (adult)",
-    audience:"adult",
-    redFlags:[
-      {id:"ha_thunder", label:"thunderclap / maximal at onset"},
-      {id:"ha_exertional", label:"exertional / Valsalva triggered"},
-      {id:"ha_neuro", label:"focal neuro deficits"},
-      {id:"ha_meningeal", label:"fever/neck stiffness"},
-      {id:"ha_preg", label:"pregnancy/postpartum"},
-      {id:"ha_cancer", label:"known cancer / HIV"},
-      {id:"ha_anticoag", label:"on anticoagulation"}
-    ],
-    questions:[
-      {id:"onset", label:"Onset", type:"choice", options:["sudden","gradual","unclear"]},
-      {id:"duration", label:"Duration", type:"text", placeholder:"e.g., 6 hours"},
-      {id:"timing", label:"Timing", type:"choice", options:["constant","intermittent","recurrent"]},
-      {id:"quality", label:"Quality", type:"choice", options:["throbbing","pressure","sharp","bandlike"]},
-      {id:"severity", label:"Severity (0–10)", type:"scale", min:0, max:10, step:1},
-      {id:"location", label:"Location", type:"chips", options:["diffuse","frontal","temporal","occipital","unilateral"]},
-      {id:"assoc", label:"Associated", type:"multichips", options:["photophobia","phonophobia","nausea/vomiting","visual aura","neck pain"]},
-      {id:"mods", label:"Modifiers", type:"multichips", options:["worse with activity","relieved by rest","no relief with OTC meds"]},
-      {id:"context", label:"Context / notes", type:"textarea"}
-    ]
-  },
-  {
-    id:"abdominal_pain",
-    label:"Abdominal pain (adult)",
-    audience:"adult",
-    redFlags:[
-      {id:"abd_guard", label:"peritoneal signs / guarding"},
-      {id:"abd_hypotension", label:"hypotension / syncope"},
-      {id:"abd_gi_bleed", label:"GI bleeding"},
-      {id:"abd_preg", label:"pregnancy (consider ectopic)"},
-      {id:"abd_immune", label:"immunocompromised"},
-    ],
-    questions:[
-      {id:"onset", label:"Onset", type:"choice", options:["sudden","gradual","unclear"]},
-      {id:"duration", label:"Duration", type:"text", placeholder:"e.g., 12 hours"},
-      {id:"location", label:"Location", type:"chips", options:["RUQ","RLQ","LUQ","LLQ","periumbilical","epigastric","diffuse"]},
-      {id:"character", label:"Character", type:"choice", options:["cramping","aching","sharp","burning","colicky"]},
-      {id:"assoc", label:"Associated", type:"multichips", options:["nausea/vomiting","diarrhea","constipation","fever","urinary symptoms","vaginal bleeding/discharge"]},
-      {id:"mods", label:"Modifiers", type:"multichips", options:["worse after meals","improved with bowel movement","worse with movement"]},
-      {id:"context", label:"Context / notes", type:"textarea"}
-    ]
-  },
-  {
-    id:"dyspnea",
-    label:"Shortness of breath (adult)",
-    audience:"adult",
-    redFlags:[
-      {id:"sob_hypoxia", label:"hypoxia / cyanosis"},
-      {id:"sob_stridor", label:"stridor / airway compromise"},
-      {id:"sob_chestpain", label:"concurrent chest pain"},
-      {id:"sob_hemoptysis", label:"hemoptysis"},
-      {id:"sob_unilateral_swelling", label:"unilateral leg swelling"},
-      {id:"sob_anticoag", label:"on anticoagulation"}
-    ],
-    questions:[
-      {id:"onset", label:"Onset", type:"choice", options:["sudden","gradual","unclear"]},
-      {id:"duration", label:"Duration", type:"text", placeholder:"e.g., 2 days"},
-      {id:"timing", label:"Timing", type:"choice", options:["continuous","episodic","exertional"]},
-      {id:"triggers", label:"Triggers", type:"multichips", options:["exertion","lying flat","exposure","infection","allergens"]},
-      {id:"assoc", label:"Associated", type:"multichips", options:["wheezing","cough","fever","pleuritic pain","leg swelling"]},
-      {id:"risk", label:"Risk factors", type:"multichips", options:["known COPD/asthma","heart failure","prior PE/DVT","recent surgery/immobilization","active cancer"]},
-      {id:"context", label:"Context / notes", type:"textarea"}
-    ]
-  },
-  {
-    id:"peds_fever_vom",
-    label:"Fever / vomiting (peds)",
-    audience:"peds",
-    redFlags:[
-      {id:"p_nuchal", label:"neck stiffness / meningismus"},
-      {id:"p_lethargy", label:"toxic appearance / lethargy"},
-      {id:"p_dehydration", label:"poor UOP / dry mucosa"},
-      {id:"p_respiratory", label:"respiratory distress"},
-      {id:"p_rash", label:"petechial/purpuric rash"}
-    ],
-    questions:[
-      {id:"duration", label:"Duration of symptoms", type:"text", placeholder:"e.g., 24 hours"},
-      {id:"fever", label:"Max temp (°F)", type:"text", placeholder:"e.g., 102.4"},
-      {id:"intake", label:"PO intake", type:"choice", options:["normal","reduced","minimal"]},
-      {id:"uop", label:"Urine output", type:"choice", options:["normal","reduced","none in 8–12h"]},
-      {id:"assoc", label:"Associated", type:"multichips", options:["cough","congestion","diarrhea","abdominal pain","rash","ear pain"]},
-      {id:"vax", label:"Vaccination status", type:"choice", options:["up to date","delayed","unknown"]},
-      {id:"appearance", label:"Appearance", type:"choice", options:["nontoxic","ill-appearing","lethargic"]},
-      {id:"sickcontacts", label:"Sick contacts", type:"choice", options:["none known","school/daycare","household"]},
-      {id:"weight_source", label:"Weight source", type:"choice", options:["measured today","reported by caregiver"]},
-      {id:"context", label:"Context / notes", type:"textarea"}
-    ]
-  }
-];
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
 
-/** =======================
- *  STATE
- *  ======================= */
-const state = {
-  age:null, sex:null, sexOther:null, pregnancy:null,
-  history: new Set(),
-  complaintId: COMPLAINTS[0].id,
-  answers: {},   // answers[questionId] = value
-  redflags: new Set()
-};
+  <script>
+    /* ========= Default built-in config (fallback if no complaints.json) ========= */
+    let COMPLAINTS = [
+      {
+        id:"chest_pain",
+        label:"Chest pain (adult)",
+        audience:"adult",
+        redFlags:[
+          {id:"cp_syncope", label:"syncope / near-syncope"},
+          {id:"cp_rest_pain", label:"pain at rest with diaphoresis"},
+          {id:"cp_neuro", label:"neuro deficits"},
+          {id:"cp_hemoptysis", label:"hemoptysis"},
+          {id:"cp_cocaine", label:"recent cocaine"},
+          {id:"cp_anticoag", label:"on anticoagulation"}
+        ],
+        questions:[
+          {id:"onset", label:"Onset", type:"choice", options:["sudden","gradual","unclear"]},
+          {id:"duration", label:"Duration", type:"text", placeholder:"e.g., 30 minutes"},
+          {id:"timing", label:"Timing", type:"choice", options:["constant","intermittent","waxing/waning"]},
+          {id:"quality", label:"Quality", type:"choice", options:["pressure","tightness","sharp","burning","tearing"]},
+          {id:"severity", label:"Severity (0–10)", type:"scale", min:0, max:10, step:1},
+          {id:"location", label:"Location", type:"chips", options:["central","left chest","right chest","diffuse"]},
+          {id:"radiation", label:"Radiation", type:"chips", options:["none","left arm","jaw","back"]},
+          {id:"assoc", label:"Associated", type:"multichips", options:["dyspnea","diaphoresis","nausea/vomiting","palpitations","near-syncope"]},
+          {id:"risk", label:"Risk factors", type:"multichips", options:["known CAD","estrogen therapy","immobilization","active cancer","recent surgery","prior PE/DVT","cocaine use"]},
+          {id:"mods", label:"Modifiers", type:"multichips", options:["worse exertion","worse inspiration","better rest","worse lying flat","better leaning forward"]},
+          {id:"context", label:"Context / notes", type:"textarea"}
+        ]
+      },
+      {
+        id:"headache",
+        label:"Headache (adult)",
+        audience:"adult",
+        redFlags:[
+          {id:"ha_thunder", label:"thunderclap / maximal at onset"},
+          {id:"ha_exertional", label:"exertional / Valsalva triggered"},
+          {id:"ha_neuro", label:"focal neuro deficits"},
+          {id:"ha_meningeal", label:"fever/neck stiffness"},
+          {id:"ha_preg", label:"pregnancy/postpartum"},
+          {id:"ha_cancer", label:"known cancer / HIV"},
+          {id:"ha_anticoag", label:"on anticoagulation"}
+        ],
+        questions:[
+          {id:"onset", label:"Onset", type:"choice", options:["sudden","gradual","unclear"]},
+          {id:"duration", label:"Duration", type:"text", placeholder:"e.g., 6 hours"},
+          {id:"timing", label:"Timing", type:"choice", options:["constant","intermittent","recurrent"]},
+          {id:"quality", label:"Quality", type:"choice", options:["throbbing","pressure","sharp","bandlike"]},
+          {id:"severity", label:"Severity (0–10)", type:"scale", min:0, max:10, step:1},
+          {id:"location", label:"Location", type:"chips", options:["diffuse","frontal","temporal","occipital","unilateral"]},
+          {id:"assoc", label:"Associated", type:"multichips", options:["photophobia","phonophobia","nausea/vomiting","visual aura","neck pain"]},
+          {id:"mods", label:"Modifiers", type:"multichips", options:["worse with activity","relieved by rest","no relief with OTC meds"]},
+          {id:"context", label:"Context / notes", type:"textarea"}
+        ]
+      },
+      {
+        id:"abdominal_pain",
+        label:"Abdominal pain (adult)",
+        audience:"adult",
+        redFlags:[
+          {id:"abd_guard", label:"peritoneal signs / guarding"},
+          {id:"abd_hypotension", label:"hypotension / syncope"},
+          {id:"abd_gi_bleed", label:"GI bleeding"},
+          {id:"abd_preg", label:"pregnancy (consider ectopic)"},
+          {id:"abd_immune", label:"immunocompromised"}
+        ],
+        questions:[
+          {id:"onset", label:"Onset", type:"choice", options:["sudden","gradual","unclear"]},
+          {id:"duration", label:"Duration", type:"text", placeholder:"e.g., 12 hours"},
+          {id:"location", label:"Location", type:"chips", options:["RUQ","RLQ","LUQ","LLQ","periumbilical","epigastric","diffuse"]},
+          {id:"character", label:"Character", type:"choice", options:["cramping","aching","sharp","burning","colicky"]},
+          {id:"assoc", label:"Associated", type:"multichips", options:["nausea/vomiting","diarrhea","constipation","fever","urinary symptoms","vaginal bleeding/discharge"]},
+          {id:"mods", label:"Modifiers", type:"multichips", options:["worse after meals","improved with bowel movement","worse with movement"]},
+          {id:"context", label:"Context / notes", type:"textarea"}
+        ]
+      },
+      {
+        id:"dyspnea",
+        label:"Shortness of breath (adult)",
+        audience:"adult",
+        redFlags:[
+          {id:"sob_hypoxia", label:"hypoxia / cyanosis"},
+          {id:"sob_stridor", label:"stridor / airway compromise"},
+          {id:"sob_chestpain", label:"concurrent chest pain"},
+          {id:"sob_hemoptysis", label:"hemoptysis"},
+          {id:"sob_unilateral_swelling", label:"unilateral leg swelling"},
+          {id:"sob_anticoag", label:"on anticoagulation"}
+        ],
+        questions:[
+          {id:"onset", label:"Onset", type:"choice", options:["sudden","gradual","unclear"]},
+          {id:"duration", label:"Duration", type:"text", placeholder:"e.g., 2 days"},
+          {id:"timing", label:"Timing", type:"choice", options:["continuous","episodic","exertional"]},
+          {id:"triggers", label:"Triggers", type:"multichips", options:["exertion","lying flat","exposure","infection","allergens"]},
+          {id:"assoc", label:"Associated", type:"multichips", options:["wheezing","cough","fever","pleuritic pain","leg swelling"]},
+          {id:"risk", label:"Risk factors", type:"multichips", options:["known COPD/asthma","heart failure","prior PE/DVT","recent surgery/immobilization","active cancer"]},
+          {id:"context", label:"Context / notes", type:"textarea"}
+        ]
+      },
+      {
+        id:"peds_fever_vom",
+        label:"Fever / vomiting (peds)",
+        audience:"peds",
+        redFlags:[
+          {id:"p_nuchal", label:"neck stiffness / meningismus"},
+          {id:"p_lethargy", label:"toxic appearance / lethargy"},
+          {id:"p_dehydration", label:"poor UOP / dry mucosa"},
+          {id:"p_respiratory", label:"respiratory distress"},
+          {id:"p_rash", label:"petechial/purpuric rash"}
+        ],
+        questions:[
+          {id:"duration", label:"Duration of symptoms", type:"text", placeholder:"e.g., 24 hours"},
+          {id:"fever", label:"Max temp (°F)", type:"text", placeholder:"e.g., 102.4"},
+          {id:"intake", label:"PO intake", type:"choice", options:["normal","reduced","minimal"]},
+          {id:"uop", label:"Urine output", type:"choice", options:["normal","reduced","none in 8–12h"]},
+          {id:"assoc", label:"Associated", type:"multichips", options:["cough","congestion","diarrhea","abdominal pain","rash","ear pain"]},
+          {id:"vax", label:"Vaccination status", type:"choice", options:["up to date","delayed","unknown"]},
+          {id:"appearance", label:"Appearance", type:"choice", options:["nontoxic","ill-appearing","lethargic"]},
+          {id:"sickcontacts", label:"Sick contacts", type:"choice", options:["none known","school/daycare","household"]},
+          {id:"weight_source", label:"Weight source", type:"choice", options:["measured today","reported by caregiver"]},
+          {id:"context", label:"Context / notes", type:"textarea"}
+        ]
+      }
+    ];
 
-/** =======================
- *  DOM refs
- *  ======================= */
-const ageEl = document.getElementById('age');
-const sexSeg = document.getElementById('sexSeg');
-const sexOtherEl = document.getElementById('sexOther');
-const pregPill = document.getElementById('pregPill');
-const pregSeg = document.getElementById('pregSeg');
-const complaintSelect = document.getElementById('complaintSelect');
-const dyn = document.getElementById('dyn');
-const previewEl = document.getElementById('preview');
-const copyBtn = document.getElementById('copyBtn');
-const resetBtn = document.getElementById('resetBtn');
-const pedsBadge = document.getElementById('pedsBadge');
-const breadcrumb = document.getElementById('breadcrumb');
+    /* ========= STATE & DOM ========= */
+    const state = {
+      age:null, sex:null, sexOther:null, pregnancy:null,
+      history:new Set(), complaintId:"chest_pain", answers:{}, redflags:new Set()
+    };
 
-/** =======================
- *  INIT
- *  ======================= */
-COMPLAINTS.forEach(c=>{
-  const opt = document.createElement('option');
-  opt.value = c.id; opt.textContent = c.label;
-  complaintSelect.appendChild(opt);
-});
-complaintSelect.value = state.complaintId;
+    const ageEl = document.getElementById('age');
+    const sexSeg = document.getElementById('sexSeg');
+    const sexOtherEl = document.getElementById('sexOther');
+    const pregPill = document.getElementById('pregPill');
+    const pregSeg = document.getElementById('pregSeg');
+    const complaintSelect = document.getElementById('complaintSelect');
+    const dyn = document.getElementById('dyn');
+    const previewEl = document.getElementById('preview');
+    const copyBtn = document.getElementById('copyBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const pedsBadge = document.getElementById('pedsBadge');
+    const breadcrumb = document.getElementById('breadcrumb');
 
-renderComplaint();
-renderPreview();
+    const importBtn = document.getElementById('importBtn');
+    const importInput = document.getElementById('importInput');
+    const exportBtn = document.getElementById('exportBtn');
+    const toastEl = document.getElementById('toast');
 
-/** =======================
- *  HANDLERS
- *  ======================= */
-ageEl.addEventListener('input', ()=>{
-  const v = +ageEl.value;
-  state.age = Number.isFinite(v) ? v : null;
-  updatePregVisibility();
-  updatePedsBadge();
-  renderComplaint(); // peds complaint visibility may change messaging
-  renderPreview();
-});
-
-sexSeg.querySelectorAll('button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    sexSeg.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    state.sex = btn.dataset.sex;
-    sexOtherEl.classList.toggle('hidden', state.sex!=='other');
-    if(state.sex!=='other') state.sexOther=null;
-    updatePregVisibility();
+    /* ========= INIT ========= */
+    hydrateComplaintSelect();
+    renderComplaint();
     renderPreview();
-  });
-});
 
-sexOtherEl.addEventListener('input', ()=>{
-  state.sexOther = sexOtherEl.value.trim() || null;
-  renderPreview();
-});
+    // Attempt to autoload complaints.json if served over http(s)
+    autoLoadExternalConfig();
 
-pregSeg.querySelectorAll('button').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    pregSeg.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    state.pregnancy = btn.dataset.preg;
-    renderPreview();
-  });
-});
-
-document.querySelectorAll('[data-hist]').forEach(ch=>{
-  ch.addEventListener('change', ()=>{
-    const key = ch.getAttribute('data-hist');
-    if(ch.checked) state.history.add(key); else state.history.delete(key);
-    renderPreview();
-  });
-});
-
-complaintSelect.addEventListener('change', ()=>{
-  state.complaintId = complaintSelect.value;
-  state.answers = {};
-  state.redflags = new Set();
-  renderComplaint();
-  renderPreview();
-});
-
-copyBtn.addEventListener('click', async ()=>{
-  await navigator.clipboard.writeText(previewEl.value);
-  copyBtn.textContent = "Copied ✓";
-  setTimeout(()=>copyBtn.textContent="Copy", 1200);
-});
-
-resetBtn.addEventListener('click', ()=>{
-  state.answers = {};
-  state.redflags = new Set();
-  renderComplaint();
-  renderPreview();
-});
-
-/** =======================
- *  RENDERERS
- *  ======================= */
-function updatePregVisibility(){
-  const show = (state.sex==='female' && Number.isFinite(state.age) && state.age>=12 && state.age<=50);
-  pregPill.classList.toggle('hidden', !show);
-  if(!show){
-    state.pregnancy = null;
-    pregSeg.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-  }
-}
-
-function updatePedsBadge(){
-  const peds = Number.isFinite(state.age) && state.age < 18;
-  pedsBadge.classList.toggle('hidden', !peds);
-}
-
-function currentComplaint(){
-  const pedsMode = Number.isFinite(state.age) && state.age<18;
-  // If user picked an adult complaint while age <18, it's still allowed.
-  // We keep it simple: selection wins. Peds badge only affects wording.
-  return COMPLAINTS.find(c=>c.id===state.complaintId);
-}
-
-function renderComplaint(){
-  const comp = currentComplaint();
-  dyn.innerHTML = '';
-  breadcrumb.innerHTML = '';
-
-  // Red flags
-  const rfWrap = document.createElement('div');
-  rfWrap.innerHTML = `<div class="sec-title">Red flags</div>`;
-  const rfGrid = document.createElement('div'); rfGrid.className = 'grid';
-  comp.redFlags.forEach(rf=>{
-    const chip = document.createElement('div');
-    chip.className = 'chip danger';
-    chip.textContent = rf.label;
-    chip.addEventListener('click', ()=>{
-      toggleSet(state.redflags, rf.id);
-      chip.classList.toggle('active', state.redflags.has(rf.id));
-      renderPreview();
-      updateBreadcrumb(comp);
+    /* ========= UI HANDLERS ========= */
+    ageEl.addEventListener('input', ()=>{
+      const v = +ageEl.value; state.age = Number.isFinite(v) ? v : null;
+      updatePregVisibility(); updatePedsBadge(); renderComplaint(); renderPreview();
     });
-    rfGrid.appendChild(chip);
-  });
-  rfWrap.appendChild(rfGrid);
-  dyn.appendChild(rfWrap);
-  dyn.appendChild(document.createElement('hr'));
 
-  // Questions
-  comp.questions.forEach(q=>{
-    const sec = document.createElement('div'); sec.className = 'stack';
-    const lab = document.createElement('label'); lab.className='sec-title'; lab.textContent = q.label;
-    sec.appendChild(lab);
-
-    if(q.type==='choice'){
-      const seg = document.createElement('div'); seg.className='seg';
-      q.options.forEach(opt=>{
-        const b=document.createElement('button'); b.textContent=opt;
-        if(state.answers[q.id]===opt) b.classList.add('active');
-        b.addEventListener('click', ()=>{
-          seg.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
-          b.classList.add('active');
-          state.answers[q.id]=opt;
-          renderPreview();
-          updateBreadcrumb(comp);
-        });
-        seg.appendChild(b);
+    sexSeg.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        sexSeg.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        state.sex = btn.dataset.sex;
+        sexOtherEl.classList.toggle('hidden', state.sex!=='other');
+        if(state.sex!=='other') state.sexOther=null;
+        updatePregVisibility(); renderPreview();
       });
-      sec.appendChild(seg);
+    });
+
+    sexOtherEl.addEventListener('input', ()=>{ state.sexOther = sexOtherEl.value.trim() || null; renderPreview(); });
+    pregSeg.querySelectorAll('button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        pregSeg.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active'); state.pregnancy = btn.dataset.preg; renderPreview();
+      });
+    });
+
+    document.querySelectorAll('[data-hist]').forEach(ch=>{
+      ch.addEventListener('change', ()=>{
+        const key = ch.getAttribute('data-hist');
+        if(ch.checked) state.history.add(key); else state.history.delete(key);
+        renderPreview();
+      });
+    });
+
+    complaintSelect.addEventListener('change', ()=>{
+      state.complaintId = complaintSelect.value; state.answers = {}; state.redflags = new Set();
+      renderComplaint(); renderPreview();
+    });
+
+    copyBtn.addEventListener('click', async ()=>{
+      await navigator.clipboard.writeText(previewEl.value);
+      flashToast('Copied to clipboard');
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      state.answers = {}; state.redflags = new Set();
+      renderComplaint(); renderPreview();
+    });
+
+    // Import/Export
+    importBtn.addEventListener('click', ()=> importInput.click());
+    importInput.addEventListener('change', handleImportFile);
+    exportBtn.addEventListener('click', exportConfig);
+
+    /* ========= RENDERERS ========= */
+    function hydrateComplaintSelect(){
+      complaintSelect.innerHTML = '';
+      COMPLAINTS.forEach(c=>{
+        const opt = document.createElement('option');
+        opt.value = c.id; opt.textContent = c.label;
+        complaintSelect.appendChild(opt);
+      });
+      // If prior selection no longer exists, default to first
+      if(!COMPLAINTS.find(c=>c.id===state.complaintId)) state.complaintId = COMPLAINTS[0]?.id || '';
+      complaintSelect.value = state.complaintId;
     }
 
-    if(q.type==='chips' || q.type==='multichips'){
-      const grid=document.createElement('div'); grid.className='grid';
-      const multi = q.type==='multichips';
-      const cur = ensureSetAnswer(q.id);
-      q.options.forEach(opt=>{
-        const chip=document.createElement('div'); chip.className='chip';
-        chip.textContent=opt;
-        if(cur.has(opt)) chip.classList.add('active');
+    function updatePregVisibility(){
+      const show = (state.sex==='female' && Number.isFinite(state.age) && state.age>=12 && state.age<=50);
+      pregPill.classList.toggle('hidden', !show);
+      if(!show){
+        state.pregnancy = null;
+        pregSeg.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+      }
+    }
+    function updatePedsBadge(){
+      const peds = Number.isFinite(state.age) && state.age < 18;
+      pedsBadge.classList.toggle('hidden', !peds);
+    }
+    function currentComplaint(){ return COMPLAINTS.find(c=>c.id===state.complaintId); }
+
+    function renderComplaint(){
+      const comp = currentComplaint();
+      dyn.innerHTML = ''; breadcrumb.innerHTML = '';
+      if(!comp){ dyn.textContent = 'No complaint definition loaded.'; return; }
+
+      // Red flags
+      const rfWrap = document.createElement('div');
+      rfWrap.innerHTML = `<h4 class="section-title">Red flags</h4>`;
+      const rfGrid = document.createElement('div'); rfGrid.className = 'grid';
+      comp.redFlags.forEach(rf=>{
+        const chip = document.createElement('div'); chip.className = 'chip danger'; chip.textContent = rf.label;
         chip.addEventListener('click', ()=>{
-          if(multi){
-            toggleSet(cur,opt);
-          }else{
-            cur.clear(); cur.add(opt);
-          }
-          state.answers[q.id]=cur;
-          chip.classList.toggle('active');
-          if(!multi){
-            // deactivate siblings
-            grid.querySelectorAll('.chip').forEach(c=>{
-              if(c!==chip) c.classList.remove('active');
-            });
-          }
-          renderPreview();
-          updateBreadcrumb(comp);
+          toggleSet(state.redflags, rf.id);
+          chip.classList.toggle('active', state.redflags.has(rf.id));
+          renderPreview(); updateBreadcrumb(comp);
         });
-        grid.appendChild(chip);
+        rfGrid.appendChild(chip);
       });
-      sec.appendChild(grid);
+      rfWrap.appendChild(rfGrid);
+      dyn.appendChild(rfWrap);
+      dyn.appendChild(document.createElement('hr'));
+
+      // Questions
+      comp.questions.forEach(q=>{
+        const sec = document.createElement('section'); sec.className = 'card'; sec.style.marginTop = '1rem';
+        const lab = document.createElement('h4'); lab.className='section-title'; lab.textContent = q.label;
+        sec.appendChild(lab);
+
+        if(q.type==='choice'){
+          const seg = document.createElement('div'); seg.className='seg';
+          (q.options||[]).forEach(opt=>{
+            const b=document.createElement('button'); b.textContent=opt;
+            if(state.answers[q.id]===opt) b.classList.add('active');
+            b.addEventListener('click', ()=>{
+              seg.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+              b.classList.add('active'); state.answers[q.id]=opt; renderPreview(); updateBreadcrumb(comp);
+            });
+            seg.appendChild(b);
+          });
+          sec.appendChild(seg);
+        }
+
+        if(q.type==='chips' || q.type==='multichips'){
+          const grid=document.createElement('div'); grid.className='grid';
+          const multi = q.type==='multichips'; const cur = ensureSetAnswer(q.id);
+          (q.options||[]).forEach(opt=>{
+            const chip=document.createElement('div'); chip.className='chip'; chip.textContent=opt;
+            if(cur.has(opt)) chip.classList.add('active');
+            chip.addEventListener('click', ()=>{
+              if(multi){ toggleSet(cur,opt); } else { cur.clear(); cur.add(opt); }
+              state.answers[q.id]=cur; chip.classList.toggle('active');
+              if(!multi){ grid.querySelectorAll('.chip').forEach(c=>{ if(c!==chip) c.classList.remove('active'); }); }
+              renderPreview(); updateBreadcrumb(comp);
+            });
+            grid.appendChild(chip);
+          });
+          sec.appendChild(grid);
+        }
+
+        if(q.type==='scale'){
+          const row=document.createElement('div'); row.className='row';
+          const input=document.createElement('input'); input.type='range';
+          input.min=q.min??0; input.max=q.max??10; input.step=q.step||1;
+          input.value = (typeof state.answers[q.id]==='number') ? state.answers[q.id] : Math.round((+input.max + +input.min)/2);
+          const out=document.createElement('span'); out.className='badge'; out.textContent=input.value;
+          input.addEventListener('input', ()=>{ state.answers[q.id]=+input.value; out.textContent=input.value; renderPreview(); updateBreadcrumb(comp); });
+          row.appendChild(input); row.appendChild(out); sec.appendChild(row);
+        }
+
+        if(q.type==='text'){
+          const inp=document.createElement('input'); inp.type='text'; inp.placeholder=q.placeholder||'';
+          inp.style.width='100%'; inp.style.padding='8px'; inp.style.border='1px solid #ddd'; inp.style.borderRadius='var(--border-radius)';
+          if(typeof state.answers[q.id]==='string') inp.value=state.answers[q.id];
+          inp.addEventListener('input', ()=>{ state.answers[q.id]=inp.value.trim(); renderPreview(); updateBreadcrumb(comp); });
+          sec.appendChild(inp);
+        }
+
+        if(q.type==='textarea'){
+          const ta=document.createElement('textarea'); ta.rows=3; ta.placeholder=q.placeholder||'';
+          ta.style.width='100%'; ta.style.padding='8px'; ta.style.border='1px solid #ddd'; ta.style.borderRadius='var(--border-radius)';
+          if(typeof state.answers[q.id]==='string') ta.value=state.answers[q.id];
+          ta.addEventListener('input', ()=>{ state.answers[q.id]=ta.value.trim(); renderPreview(); updateBreadcrumb(comp); });
+          sec.appendChild(ta);
+        }
+
+        dyn.appendChild(sec);
+      });
+
+      updateBreadcrumb(comp);
     }
 
-    if(q.type==='scale'){
-      const row=document.createElement('div'); row.className='row';
-      const input=document.createElement('input'); input.type='range';
-      input.min=q.min; input.max=q.max; input.step=q.step||1;
-      input.value = (typeof state.answers[q.id]==='number') ? state.answers[q.id] : Math.round((+q.max + +q.min)/2);
-      const out=document.createElement('div'); out.className='badge'; out.textContent=input.value;
-      input.addEventListener('input', ()=>{ state.answers[q.id]=+input.value; out.textContent=input.value; renderPreview(); updateBreadcrumb(comp); });
-      row.appendChild(input); row.appendChild(out); sec.appendChild(row);
+    function updateBreadcrumb(comp){
+      const crumbs = [{label:'Red flags', done: state.redflags.size>0}];
+      comp.questions.forEach(q=>{
+        const v = state.answers[q.id]; let done=false;
+        if(['text','textarea'].includes(q.type)) done = typeof v==='string' && v.length>0;
+        if(['choice'].includes(q.type)) done = typeof v==='string';
+        if(['chips','multichips'].includes(q.type)) done = v instanceof Set && v.size>0;
+        if(['scale'].includes(q.type)) done = typeof v==='number';
+        crumbs.push({label:q.label, done});
+      });
+      breadcrumb.innerHTML=''; crumbs.forEach(c=>{
+        const el=document.createElement('span'); el.className='crumb'+(c.done?' done':''); el.textContent=c.label; breadcrumb.appendChild(el);
+      });
     }
 
-    if(q.type==='text'){
-      const inp=document.createElement('input'); inp.type='text'; inp.placeholder=q.placeholder||'';
-      if(typeof state.answers[q.id]==='string') inp.value=state.answers[q.id];
-      inp.addEventListener('input', ()=>{ state.answers[q.id]=inp.value.trim(); renderPreview(); updateBreadcrumb(comp); });
-      sec.appendChild(inp);
+    function renderPreview(){
+      const comp = currentComplaint(); const parts = []; if(!comp){ previewEl.value=''; return; }
+
+      const ageStr = Number.isFinite(state.age) ? `${state.age}-year-old` : null;
+      const sexStr = (state.sex==='female') ? 'female' :
+                     (state.sex==='male') ? 'male' :
+                     (state.sex==='other' && state.sexOther) ? state.sexOther : null;
+
+      let subject = ageStr && sexStr ? `${ageStr} ${sexStr}` : ageStr || sexStr || 'Patient';
+      if(Number.isFinite(state.age) && state.age<18 && ageStr) subject = ageStr;
+
+      const pregTag = (state.sex==='female' && state.pregnancy==='yes') ? 'pregnant ' : '';
+      const ccPhrase = comp.label.replace(/\s*\((adult|peds)\)$/i,'').toLowerCase();
+      parts.push(`${subject} ${pregTag}presents with ${ccPhrase}.`);
+
+      if(state.history.size){
+        const src=[]; if(state.history.has('patient')) src.push('patient'); if(state.history.has('family')) src.push('family'); if(state.history.has('ems')) src.push('EMS'); if(state.history.has('chart')) src.push('chart review');
+        const lim=[]; if(state.history.has('unresponsive')) lim.push('unresponsive'); if(state.history.has('ams')) lim.push('altered mental status'); if(state.history.has('language')) lim.push('language barrier');
+        const s1 = src.length ? `History provided by ${src.join(', ')}` : ''; const s2 = lim.length ? `limited by ${lim.join(', ')}` : '';
+        const join=[s1,s2].filter(Boolean).join('; '); if(join) parts.push(cap(join)+'.');
+      }
+
+      parts.push(buildComplaintSentences(comp, state));
+
+      if(state.redflags.size){
+        const labels = comp.redFlags.filter(r=>state.redflags.has(r.id)).map(r=>r.label);
+        if(labels.length) parts.push(`Red flags reported: ${listify(labels)}.`);
+      }
+
+      previewEl.value = tidy(parts.filter(Boolean).join(' '));
     }
 
-    if(q.type==='textarea'){
-      const ta=document.createElement('textarea'); ta.rows=3; ta.placeholder=q.placeholder||'';
-      if(typeof state.answers[q.id]==='string') ta.value=state.answers[q.id];
-      ta.addEventListener('input', ()=>{ state.answers[q.id]=ta.value.trim(); renderPreview(); updateBreadcrumb(comp); });
-      sec.appendChild(ta);
+    function buildComplaintSentences(comp, st){
+      const a = (id)=>st.answers[id]; const s = [];
+      if(comp.id==='chest_pain'){
+        const bits=[]; if(a('onset')) bits.push(`${a('onset')} onset`); if(a('duration')) bits.push(`${a('duration')} duration`);
+        if(a('timing')) bits.push(a('timing')); if(a('quality')) bits.push(a('quality'));
+        if(typeof a('severity')==='number') bits.push(`severity ${a('severity')}/10`);
+        if(setHas(a('location'))) bits.push(`located ${fromSet(a('location'))}`);
+        if(setHas(a('radiation')) && !a('radiation').has('none')) bits.push(`radiating to ${fromSet(a('radiation'))}`);
+        if(bits.length) s.push(cap(bits.join(', ')) + '.');
+        if(setHas(a('assoc'))) s.push(`Associated symptoms: ${fromSet(a('assoc'))}.`);
+        if(setHas(a('risk'))) s.push(`Risk factors: ${fromSet(a('risk'))}.`);
+        if(setHas(a('mods'))) s.push(`Modifiers: ${fromSet(a('mods'))}.`);
+        if(a('context')) s.push(a('context') + '.');
+      }
+      if(comp.id==='headache'){
+        const bits=[]; if(a('onset')) bits.push(`${a('onset')} onset`); if(a('duration')) bits.push(`${a('duration')} duration`);
+        if(a('timing')) bits.push(a('timing')); if(a('quality')) bits.push(a('quality'));
+        if(typeof a('severity')==='number') bits.push(`severity ${a('severity')}/10`);
+        if(setHas(a('location'))) bits.push(`${fromSet(a('location'))} location`);
+        if(bits.length) s.push(cap(bits.join(', ')) + '.');
+        if(setHas(a('assoc'))) s.push(`Associated symptoms: ${fromSet(a('assoc'))}.`);
+        if(setHas(a('mods'))) s.push(`Modifiers: ${fromSet(a('mods'))}.`);
+        if(a('context')) s.push(a('context') + '.');
+      }
+      if(comp.id==='abdominal_pain'){
+        const bits=[]; if(a('onset')) bits.push(`${a('onset')} onset`); if(a('duration')) bits.push(`${a('duration')} duration`);
+        if(setHas(a('location'))) bits.push(`${fromSet(a('location'))}`); if(a('character')) bits.push(a('character'));
+        if(bits.length) s.push(cap(bits.join(', ')) + '.');
+        if(setHas(a('assoc'))) s.push(`Associated symptoms: ${fromSet(a('assoc'))}.`);
+        if(setHas(a('mods'))) s.push(`Modifiers: ${fromSet(a('mods'))}.`);
+        if(a('context')) s.push(a('context') + '.');
+      }
+      if(comp.id==='dyspnea'){
+        const bits=[]; if(a('onset')) bits.push(`${a('onset')} onset`); if(a('duration')) bits.push(`${a('duration')} duration`); if(a('timing')) bits.push(a('timing'));
+        if(bits.length) s.push(cap(bits.join(', ')) + '.');
+        if(setHas(a('triggers'))) s.push(`Triggers: ${fromSet(a('triggers'))}.`);
+        if(setHas(a('assoc'))) s.push(`Associated: ${fromSet(a('assoc'))}.`);
+        if(setHas(a('risk'))) s.push(`Risk factors: ${fromSet(a('risk'))}.`);
+        if(a('context')) s.push(a('context') + '.');
+      }
+      if(comp.id==='peds_fever_vom'){
+        const bits=[]; if(a('duration')) bits.push(`duration ${a('duration')}`); if(a('fever')) bits.push(`fever max ${a('fever')} °F`);
+        if(bits.length) s.push(cap(bits.join(', ')) + '.');
+        const status=[]; if(a('intake')) status.push(`PO intake ${a('intake')}`); if(a('uop')) status.push(`urine output ${a('uop')}`); if(a('appearance')) status.push(a('appearance'));
+        if(status.length) s.push(cap(status.join(', ')) + '.');
+        if(setHas(a('assoc'))) s.push(`Associated: ${fromSet(a('assoc'))}.`);
+        if(a('vax')) s.push(`Vaccinations ${a('vax')}.`);
+        if(a('sickcontacts')) s.push(`Sick contacts ${a('sickcontacts')}.`);
+        if(a('weight_source')) s.push(`Weight ${a('weight_source')}.`);
+        if(a('context')) s.push(a('context') + '.');
+      }
+      return s.join(' ');
     }
 
-    dyn.appendChild(sec);
-  });
+    /* ========= Import/Export & Validation ========= */
+    async function autoLoadExternalConfig(){
+      try{
+        // Skip if file:// origin (fetch often blocked)
+        if(location.protocol === 'file:') return;
+        const res = await fetch('complaints.json', {cache:'no-store'});
+        if(!res.ok) return;
+        const json = await res.json();
+        applyExternalConfig(json, {silent:true});
+      }catch{ /* ignore */ }
+    }
 
-  updateBreadcrumb(comp);
-}
+    function handleImportFile(e){
+      const file = e.target.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const json = JSON.parse(reader.result);
+          applyExternalConfig(json);
+        }catch(err){
+          flashToast('Invalid JSON file', true);
+        } finally {
+          importInput.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
 
-function updateBreadcrumb(comp){
-  const crumbs = [];
-  // red flag crumb
-  crumbs.push({label:'Red flags', done: state.redflags.size>0});
-  comp.questions.forEach(q=>{
-    const v = state.answers[q.id];
-    let done=false;
-    if(['text','textarea'].includes(q.type)) done = typeof v==='string' && v.length>0;
-    if(['choice'].includes(q.type)) done = typeof v==='string';
-    if(['chips','multichips'].includes(q.type)) done = v instanceof Set && v.size>0;
-    if(['scale'].includes(q.type)) done = typeof v==='number';
-    crumbs.push({label:q.label, done});
-  });
-  breadcrumb.innerHTML='';
-  crumbs.forEach(c=>{
-    const el=document.createElement('div'); el.className='crumb'+(c.done?' done':''); el.textContent=c.label;
-    breadcrumb.appendChild(el);
-  });
-}
+    function applyExternalConfig(json, opts={}){
+      const {ok, complaints, errors} = validateConfig(json);
+      if(!ok){
+        flashToast('Config errors: ' + errors.join('; '), true);
+        return;
+      }
+      COMPLAINTS = complaints;
+      hydrateComplaintSelect();
+      state.answers = {}; state.redflags = new Set();
+      renderComplaint(); renderPreview();
+      if(!opts.silent) flashToast('Config loaded');
+    }
 
-function renderPreview(){
-  const comp = currentComplaint();
-  const parts = [];
+    function validateConfig(json){
+      const errors = [];
+      const out = [];
 
-  // First line: age + sex + CC
-  const ageStr = Number.isFinite(state.age) ? `${state.age}-year-old` : null;
-  const sexStr = (()=>{
-    if(state.sex==='female') return 'female';
-    if(state.sex==='male') return 'male';
-    if(state.sex==='other' && state.sexOther) return state.sexOther;
-    return null;
-  })();
+      const source = Array.isArray(json) ? json : (Array.isArray(json?.complaints) ? json.complaints : null);
+      if(!source) errors.push('Missing "complaints" array');
 
-  let subject = ageStr && sexStr ? `${ageStr} ${sexStr}` :
-                ageStr ? ageStr :
-                sexStr ? sexStr : 'Patient';
+      const allowedTypes = new Set(['choice','chips','multichips','scale','text','textarea']);
+      if(source){
+        source.forEach((c, idx)=>{
+          if(!c?.id || !c?.label) { errors.push(`Complaint #${idx+1} missing id/label`); return; }
+          if(!Array.isArray(c.redFlags)) errors.push(`${c.id}: redFlags must be an array`);
+          if(!Array.isArray(c.questions)) errors.push(`${c.id}: questions must be an array`);
 
-  // Pediatric subject tweak
-  const peds = Number.isFinite(state.age) && state.age<18;
-  if(peds) subject = `${ageStr ?? 'Child'}`;
+          // Copy shallow (ignore unknown keys, allow audience)
+          const copy = { id:c.id, label:c.label, audience:c.audience || 'adult', redFlags:[], questions:[] };
 
-  // Pregnancy tag (inline, no parentheses/extra PTA verbiage)
-  const pregTag = (state.sex==='female' && state.pregnancy==='yes') ? 'pregnant ' : '';
+          (c.redFlags||[]).forEach((rf, rIdx)=>{
+            if(!rf?.id || !rf?.label) errors.push(`${c.id}: redFlag #${rIdx+1} missing id/label`);
+            else copy.redFlags.push({id:String(rf.id), label:String(rf.label)});
+          });
 
-  const ccPhrase = comp ? comp.label.replace(/\s*\((adult|peds)\)$/i,'').toLowerCase() : 'chief complaint';
-  parts.push(`${subject} ${pregTag}presents with ${ccPhrase}.`);
+          (c.questions||[]).forEach((q, qIdx)=>{
+            if(!q?.id || !q?.label || !q?.type) { errors.push(`${c.id}: question #${qIdx+1} missing id/label/type`); return; }
+            if(!allowedTypes.has(q.type)) { errors.push(`${c.id}:${q.id} invalid type "${q.type}"`); return; }
+            const base = { id:String(q.id), label:String(q.label), type:q.type };
+            if(['choice','chips','multichips'].includes(q.type)){
+              if(!Array.isArray(q.options) || q.options.length===0) errors.push(`${c.id}:${q.id} requires non-empty options`);
+              else base.options = q.options.map(String);
+            }
+            if(q.type==='scale'){
+              base.min = Number.isFinite(+q.min) ? +q.min : 0;
+              base.max = Number.isFinite(+q.max) ? +q.max : 10;
+              base.step = Number.isFinite(+q.step) ? +q.step : 1;
+            }
+            if(q.placeholder) base.placeholder = String(q.placeholder);
+            copy.questions.push(base);
+          });
 
-  // Optional history source/limits
-  if(state.history.size){
-    const src = [];
-    if(state.history.has('patient')) src.push('patient');
-    if(state.history.has('family')) src.push('family');
-    if(state.history.has('ems')) src.push('EMS');
-    if(state.history.has('chart')) src.push('chart review');
-    const srcStr = src.length ? `History provided by ${src.join(', ')}` : '';
-    const lim = [];
-    if(state.history.has('unresponsive')) lim.push('unresponsive');
-    if(state.history.has('ams')) lim.push('altered mental status');
-    if(state.history.has('language')) lim.push('language barrier');
-    const limStr = lim.length ? `limited by ${lim.join(', ')}` : '';
-    const join = [srcStr, limStr].filter(Boolean).join('; ');
-    if(join) parts.push(`${capitalize(join)}.`);
-  }
+          out.push(copy);
+        });
+      }
 
-  // Complaint-specific assembly
-  parts.push(buildComplaintSentences(comp, state));
+      return { ok: errors.length===0 && out.length>0, complaints: out, errors };
+    }
 
-  // Red flags sentence (if any checked)
-  if(state.redflags.size){
-    const labels = comp.redFlags.filter(r=>state.redflags.has(r.id)).map(r=>r.label);
-    if(labels.length) parts.push(`Red flags reported: ${listify(labels)}.`);
-  }
+    function exportConfig(){
+      const blob = new Blob([JSON.stringify({version:1, complaints:COMPLAINTS}, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'complaints.json';
+      document.body.appendChild(a);
+      a.click();
+      URL.revokeObjectURL(a.href);
+      a.remove();
+      flashToast('Config exported');
+    }
 
-  // Output
-  previewEl.value = tidy(parts.filter(Boolean).join(' '));
-}
+    /* ========= Utils ========= */
+    function flashToast(msg, isError=false){
+      toastEl.textContent = msg;
+      toastEl.className = 'toast ' + (isError ? 'error' : '');
+      requestAnimationFrame(()=> {
+        toastEl.classList.add('show');
+        setTimeout(()=> toastEl.classList.remove('show'), 1600);
+      });
+    }
 
-/** Build sentences for each complaint from answers */
-function buildComplaintSentences(comp, st){
-  if(!comp) return '';
-
-  const a = (id)=>st.answers[id];
-  const s = [];
-
-  if(comp.id==='chest_pain'){
-    // onset/duration/quality/severity/location/radiation/assoc/risk/mods
-    const bits = [];
-    if(a('onset')) bits.push(`${a('onset')} onset`);
-    if(a('duration')) bits.push(`${a('duration')} duration`);
-    if(a('timing')) bits.push(a('timing'));
-    if(a('quality')) bits.push(a('quality'));
-    if(typeof a('severity')==='number') bits.push(`severity ${a('severity')}/10`);
-    if(setHas(a('location'))) bits.push(`located ${fromSet(a('location'))}`);
-    if(setHas(a('radiation')) && !a('radiation').has('none')) bits.push(`radiating to ${fromSet(a('radiation'))}`);
-    if(bits.length) s.push(capitalize(bits.join(', ')) + '.');
-
-    if(setHas(a('assoc'))) s.push(`Associated symptoms: ${fromSet(a('assoc'))}.`);
-    if(setHas(a('risk'))) s.push(`Risk factors: ${fromSet(a('risk'))}.`);
-    if(setHas(a('mods'))) s.push(`Modifiers: ${fromSet(a('mods'))}.`);
-    if(a('context')) s.push(a('context') + '.');
-  }
-
-  if(comp.id==='headache'){
-    const bits = [];
-    if(a('onset')) bits.push(`${a('onset')} onset`);
-    if(a('duration')) bits.push(`${a('duration')} duration`);
-    if(a('timing')) bits.push(a('timing'));
-    if(a('quality')) bits.push(a('quality'));
-    if(typeof a('severity')==='number') bits.push(`severity ${a('severity')}/10`);
-    if(setHas(a('location'))) bits.push(`${fromSet(a('location'))} location`);
-    if(bits.length) s.push(capitalize(bits.join(', ')) + '.');
-
-    if(setHas(a('assoc'))) s.push(`Associated symptoms: ${fromSet(a('assoc'))}.`);
-    if(setHas(a('mods'))) s.push(`Modifiers: ${fromSet(a('mods'))}.`);
-    if(a('context')) s.push(a('context') + '.');
-  }
-
-  if(comp.id==='abdominal_pain'){
-    const bits = [];
-    if(a('onset')) bits.push(`${a('onset')} onset`);
-    if(a('duration')) bits.push(`${a('duration')} duration`);
-    if(setHas(a('location'))) bits.push(`${fromSet(a('location'))}`);
-    if(a('character')) bits.push(a('character'));
-    if(bits.length) s.push(capitalize(bits.join(', ')) + '.');
-
-    // Pregnancy mention is already inline near the start when positive
-    if(setHas(a('assoc'))) s.push(`Associated symptoms: ${fromSet(a('assoc'))}.`);
-    if(setHas(a('mods'))) s.push(`Modifiers: ${fromSet(a('mods'))}.`);
-    if(a('context')) s.push(a('context') + '.');
-  }
-
-  if(comp.id==='dyspnea'){
-    const bits = [];
-    if(a('onset')) bits.push(`${a('onset')} onset`);
-    if(a('duration')) bits.push(`${a('duration')} duration`);
-    if(a('timing')) bits.push(a('timing'));
-    if(bits.length) s.push(capitalize(bits.join(', ')) + '.');
-
-    if(setHas(a('triggers'))) s.push(`Triggers: ${fromSet(a('triggers'))}.`);
-    if(setHas(a('assoc'))) s.push(`Associated: ${fromSet(a('assoc'))}.`);
-    if(setHas(a('risk'))) s.push(`Risk factors: ${fromSet(a('risk'))}.`);
-    if(a('context')) s.push(a('context') + '.');
-  }
-
-  if(comp.id==='peds_fever_vom'){
-    const bits = [];
-    if(a('duration')) bits.push(`duration ${a('duration')}`);
-    if(a('fever')) bits.push(`fever max ${a('fever')} °F`);
-    if(bits.length) s.push(capitalize(bits.join(', ')) + '.');
-
-    const statusBits = [];
-    if(a('intake')) statusBits.push(`PO intake ${a('intake')}`);
-    if(a('uop')) statusBits.push(`urine output ${a('uop')}`);
-    if(a('appearance')) statusBits.push(a('appearance'));
-    if(statusBits.length) s.push(capitalize(statusBits.join(', ')) + '.');
-
-    if(setHas(a('assoc'))) s.push(`Associated: ${fromSet(a('assoc'))}.`);
-    if(a('vax')) s.push(`Vaccinations ${a('vax')}.`);
-    if(a('sickcontacts')) s.push(`Sick contacts ${a('sickcontacts')}.`);
-    if(a('weight_source')) s.push(`Weight ${a('weight_source')}.`);
-    if(a('context')) s.push(a('context') + '.');
-  }
-
-  return s.join(' ');
-}
-
-/** =======================
- *  UTIL
- *  ======================= */
-function toggleSet(set, v){ set.has(v)?set.delete(v):set.add(v); }
-function ensureSetAnswer(id){ if(!(state.answers[id] instanceof Set)) state.answers[id]=new Set(); return state.answers[id]; }
-function setHas(v){ return v instanceof Set && v.size>0; }
-function fromSet(s){ return [...s].join(', '); }
-function capitalize(s){ return s.replace(/^\s*[a-z]/, c=>c.toUpperCase()); }
-function listify(arr){
-  if(arr.length<=1) return arr.join('');
-  const last = arr[arr.length-1];
-  return arr.slice(0,-1).join(', ') + ' and ' + last;
-}
-function tidy(s){
-  return s.replace(/\s+/g,' ')
-          .replace(/\s+([.,;:])/g,'$1')
-          .replace(/\.\./g,'.')
-          .trim();
-}
-</script>
+    function toggleSet(set, v){ set.has(v)?set.delete(v):set.add(v); }
+    function ensureSetAnswer(id){ if(!(state.answers[id] instanceof Set)) state.answers[id]=new Set(); return state.answers[id]; }
+    function setHas(v){ return v instanceof Set && v.size>0; }
+    function fromSet(s){ return [...s].join(', '); }
+    function cap(s){ return s.replace(/^\s*[a-z]/, c=>c.toUpperCase()); }
+    function listify(arr){ if(arr.length<=1) return arr.join(''); const last = arr[arr.length-1]; return arr.slice(0,-1).join(', ') + ' and ' + last; }
+    function tidy(s){ return s.replace(/\s+/g,' ').replace(/\s+([.,;:])/g,'$1').replace(/\.\./g,'.').trim(); }
+  </script>
 </body>
 </html>
